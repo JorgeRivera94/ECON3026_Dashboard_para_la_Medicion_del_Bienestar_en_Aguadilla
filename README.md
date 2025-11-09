@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 1. Iniciar el servidor Flask:
 ```
-python app.py
+python main.py
 ```
 
 - Por defecto se ejecutará en:
