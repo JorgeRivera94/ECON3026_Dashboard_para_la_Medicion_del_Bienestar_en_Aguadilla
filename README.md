@@ -45,6 +45,7 @@ http://localhost:8501
 
 3. Demo del frontend
 ![](assets/img/front-demo.png)
+- First demo dashboard: https://youtu.be/z0MZWFM9bGg
 
 ### Team project by:
 @JorgeRivera94 Jorge Rivera (jorge.rivera94@upr.edu)\
