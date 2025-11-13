@@ -1,49 +1,141 @@
 import streamlit as st
-import requests
 import pandas as pd
 import plotly.express as px
+from openai import OpenAI
 
-st.set_page_config(page_title="Economia y Sostenibilidad en Aguadilla", layout="wide")
+# CONFIGURACIÓN DE LA PÁGINA
+st.set_page_config(page_title="Economía y Sostenibilidad en Aguadilla", layout="wide")
+st.title("Dashboard de Bienestar y Sostenibilidad en Aguadilla")
 
-# Config plotly
-
+# CONFIGURACIÓN DE PLOTLY
 config = {
     "displayModeBar": False,
     "responsive": True
 }
 
-st.title("Dashboard de Bienestar en Aguadilla")
+
+# CARGA DE DATOS
+
+st.sidebar.header("📂 Configuración de datos")
+
+uploaded_file = st.sidebar.file_uploader("Sube tu archivo CSV con los indicadores", type=["csv"])
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.success("✅ Datos cargados correctamente")
+else:
+    st.warning("⚠️ No has subido ningún CSV. Se usarán datos de ejemplo.")
+    df = pd.DataFrame({
+        "anio": ["2000", "2001", "2003", "2004", "2005", "2006"],
+        "participacion_electoral": [78, 84, 65, 90, 200, 80],
+        "educacion_superior": [55, 58, 60, 62, 65, 70],
+        "pobreza": [35, 33, 30, 28, 25, 23],
+        "empleo": [60, 62, 64, 68, 70, 72],
+        "turismo": [120, 125, 140, 145, 155, 160],
+        "energia_renovable": [5, 8, 10, 15, 18, 22]
+    })
+
+
+# VISUALIZACIÓN DE DATOS
+st.subheader("Indicadores ")
 
 col1, col2, col3 = st.columns(3)
 
-# Llamadas para la captura de datos
-# ...
-# Visual 1 de prueba
-try:
-    # Datos de prueba para probar streamlit
-    df = pd.DataFrame({
-        "años": ["2000", "2001", "2003", "2004", "2005", "2006"],
-
-        "numero_de_votantes": [78, 84, 65, 90, 200, 80],
-
-        "Porcentaje_de_Educacion_mayor_a_superior": [78, 84, 65, 90, 200, 80],
-
-        "Porcentaje_de_pobreza": [78, 84, 65, 90, 200, 80]
-
-    })  # conversion de JSON a data para el grafo
-
-    with col1:
-        fig1 = px.line(df, x="años", y="numero_de_votantes", title="Participacion electoral")
-        st.plotly_chart(fig1, use_container_width=True, config=config)
-
-    with col2:
-        fig1 = px.line(df, x="años", y="Porcentaje_de_Educacion_mayor_a_superior", title="Educacion")
-        st.plotly_chart(fig1, use_container_width=True, config=config)
-
-    with col3:
-        fig1 = px.line(df, x="años", y="Porcentaje_de_pobreza", title="Pobreza")
-        st.plotly_chart(fig1, use_container_width=True, config=config)
 
 
-except Exception as e:
-    st.error(f"[-] Err: {e}")
+with col1:
+    fig1 = px.line(df, x="anio", y="participacion_electoral", title="Participación Electoral (%)")
+    st.plotly_chart(fig1, use_container_width=True, config=config)
+
+with col2:
+    fig2 = px.line(df, x="anio", y="educacion_superior", title="Educación Superior (%)")
+    st.plotly_chart(fig2, use_container_width=True, config=config)
+
+with col3:
+    fig3 = px.line(df, x="anio", y="pobreza", title="Porcentaje de Pobreza (%)")
+    st.plotly_chart(fig3, use_container_width=True, config=config)
+
+
+
+# Segunda fila de gráficos
+st.subheader("Indicadores ") 
+
+col4, col5, col6 = st.columns(3)
+
+with col4:
+    fig4 = px.line(df, x="anio", y="empleo", title="Empleo (%)")
+    st.plotly_chart(fig4, use_container_width=True, config=config)
+
+with col5:
+    fig5 = px.line(df, x="anio", y="turismo", title="Turismo (Visitantes en miles)")
+    st.plotly_chart(fig5, use_container_width=True, config=config)
+
+
+with col6:
+    fig6 = px.line(df, x="anio", y="energia_renovable", title="Energía Renovable (%)")
+    st.plotly_chart(fig6, use_container_width=True, config=config)
+
+
+# SECCIÓN DE CHAT IA
+
+st.divider()
+st.header("💬 Asistente de Inteligencia Artificial sobre los Datos")
+
+st.markdown("""
+Este asistente usa la API de **OpenAI (GPT-4o-mini)** para analizar los datos.  
+Puedes preguntarle cosas como:
+- “¿Qué representa la primera tabla?”
+- “¿Cuál es la tendencia de la pobreza?”
+- “¿Qué relación hay entre educación y pobreza?”
+""")
+
+# API Key
+api_key = st.text_input("🔑 Introduce tu API key de OpenAI:", type="password")
+
+# Entrada del usuario
+user_input = st.text_area("✏️ Escribe tu pregunta aquí:")
+
+# Botón de consulta
+if st.button("Preguntar a la IA"):
+    if not api_key:
+        st.warning("⚠️ Por favor, introduce tu API key de OpenAI antes de consultar.")
+    elif user_input:
+        try:
+            client = OpenAI(api_key=api_key)
+
+            # Preparamos una muestra representativa del DataFrame
+            muestra = df.head(10).to_markdown(index=False)
+            columnas = ", ".join(df.columns)
+
+            system_prompt = f"""
+Eres un experto en análisis de datos socioeconómicos del municipio de Aguadilla, Puerto Rico.
+A continuación tienes una tabla de indicadores con las siguientes columnas:
+{columnas}
+
+Aquí tienes una muestra de los datos en formato tabla Markdown:
+{muestra}
+
+Tu tarea es responder preguntas del usuario de forma analítica, explicando qué representan los datos,
+qué mide cada indicador y las tendencias observadas.
+Si el usuario pregunta "qué representa la primera tabla", describe de manera detallada el contenido
+de la tabla y el significado de cada columna.
+"""
+
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_input}
+                ]
+            )
+
+            st.success(response.choices[0].message.content)
+
+        except Exception as e:
+            st.error(f"Error al conectar con OpenAI: {e}")
+    else:
+        st.info("Escribe una pregunta antes de presionar el botón.")
+
+
+# FIN
+st.divider()
