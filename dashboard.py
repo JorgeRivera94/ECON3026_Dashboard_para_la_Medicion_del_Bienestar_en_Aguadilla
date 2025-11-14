@@ -58,6 +58,14 @@ riesgo_cancer_df['riesgo'] = riesgo_cancer_df['riesgo'].interpolate()
 ## CONCENTRACION DIESEL CSV ###
 concentracion_diesel_df = pd.read_csv("./ETL/Transform/transformed_files/concentracion_diesel.csv")
 concentracion_diesel_df['concentración'] = concentracion_diesel_df['concentración'].interpolate()
+
+## CAMBIO RCP 4.5 ##
+cambio_rcp45_df = pd.read_csv("./ETL/Transform/transformed_files/cambio_RCP_45.csv")
+cambio_rcp45_df['cambio_RCP_45'] = cambio_rcp45_df['cambio_RCP_45'].interpolate()
+
+## CAMBIO RCP 8.5 ##
+cambio_rcp85_df = pd.read_csv("./ETL/Transform/transformed_files/cambio_RCP_85.csv")
+cambio_rcp85_df['cambio_RCP_85'] = cambio_rcp85_df['cambio_RCP_85'].interpolate()
 ###################################
 
 # VISUALIZACIÓN DE DATOS
@@ -97,12 +105,7 @@ with col3:
         x=0.5, y=-0.25,
         showarrow=False
     )
-    st.plotly_chart(fig3, use_container_width=True, config=config)
-
-
-
-# Segunda fila de gráficos
-# st.subheader("Indicadores ") 
+    st.plotly_chart(fig3, use_container_width=True, config=config) 
 
 col4, col5, col6 = st.columns(3)
 
@@ -153,6 +156,28 @@ with col7:
     )
     st.plotly_chart(fig7, use_container_width=True, config=config)
 
+with col8:
+    fig8 = px.line(cambio_rcp45_df, x="año", y="cambio_RCP_45", title="Diferencia en Temperatura Máxima Relativa a 2006.")
+    fig8.update_layout(xaxis_title="Año", yaxis_title="Diferencia en Temperatura Máxima Relativa a 2006 (°C)")
+    fig8.add_annotation(
+        text="Basada en el Escenario RCP 4.5. Fuente: Data Commons",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
+    st.plotly_chart(fig8, use_container_width=True, config=config)
+
+with col9:
+    fig9 = px.line(cambio_rcp85_df, x="año", y="cambio_RCP_85", title="Diferencia en Temperatura Máxima Relativa a 2006.")
+    fig9.update_layout(xaxis_title="Año", yaxis_title="Diferencia en Temperatura Máxima Relativa a 2006 (°C)")
+    fig9.add_annotation(
+        text="Basada en el Escenario RCP 8.5. Fuente: Data Commons",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
+    st.plotly_chart(fig9, use_container_width=True, config=config)
+
 ### LINKS A FUENTES DE DATOS ###
 st.markdown("""
 **Fuentes de Datos:**
@@ -163,6 +188,7 @@ st.markdown("""
 - Ingreso Medio Por Individio: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
 - Riesgo de Cáncer: [Data Commons](https://datacommons.org/place/geoId/72005?category=Environment&hl=es)
 - Concentración de MP de Diesel en Aire: [Data Commons](https://datacommons.org/place/geoId/72005?category=Environment&hl=es)
+- Cambio en Temperatura Máxima (RCP 4.5 y 8.5): [Data Commons](https://datacommons.org/place/geoId/72005?category=Environment&hl=es)
 """)
 
 
