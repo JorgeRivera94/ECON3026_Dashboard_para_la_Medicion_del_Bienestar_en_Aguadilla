@@ -28,7 +28,6 @@ else:
     df = pd.DataFrame({
         "anio": ["2000", "2001", "2003", "2004", "2005", "2006"],
         "pobreza": [35, 33, 30, 28, 25, 23],
-        "empleo": [60, 62, 64, 68, 70, 72],
         "turismo": [120, 125, 140, 145, 155, 160],
         "energia_renovable": [5, 8, 10, 15, 18, 22]
     })
@@ -40,6 +39,10 @@ part_electoral_df['participación'] = part_electoral_df['participación'].interp
 
 ### EDUCACION SUPERIOR CSV ###
 edu_superior_df = pd.read_csv("./ETL/Transform/transformed_files/educacion_superior.csv")
+
+### DESEMPLEO CSV ###
+desempleo_df = pd.read_csv("./ETL/Transform/transformed_files/desempleo.csv")
+desempleo_df['desempleo'] = desempleo_df['desempleo'].interpolate()
 ###################################
 
 # VISUALIZACIÓN DE DATOS
@@ -88,7 +91,14 @@ st.subheader("Indicadores ")
 col4, col5, col6 = st.columns(3)
 
 with col4:
-    fig4 = px.line(df, x="anio", y="empleo", title="Empleo (%)")
+    fig4 = px.line(desempleo_df, x="fecha", y="desempleo", title="Desempleo (%)")
+    fig4.update_layout(xaxis_title="Año", yaxis_title="Desempleo (%)")
+    fig4.add_annotation(
+        text="Tasa de la desempleo. Fuente: FRED",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig4, use_container_width=True, config=config)
 
 with col5:
@@ -105,6 +115,7 @@ st.markdown("""
 **Fuentes de Datos:**
 - Participación Electoral: [Comisión Estatal de Elecciones de Puerto Rico](https://ww2.ceepur.org/Home/Estadisticas)
 - Educación Superior: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/HC01ESTVC1772005)
+- Desempleo: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/LAUCN720050000000003A)
 """)
 
 
