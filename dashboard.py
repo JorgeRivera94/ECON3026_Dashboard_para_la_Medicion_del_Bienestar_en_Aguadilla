@@ -13,24 +13,6 @@ config = {
     "responsive": True
 }
 
-
-# CARGA DE DATOS
-
-st.sidebar.header("📂 Configuración de datos")
-
-uploaded_file = st.sidebar.file_uploader("Sube tu archivo CSV con los indicadores", type=["csv"])
-
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    st.success("✅ Datos cargados correctamente")
-else:
-    st.warning("⚠️ No has subido ningún CSV. Se usarán datos de ejemplo.")
-    df = pd.DataFrame({
-        "anio": ["2000", "2001", "2003", "2004", "2005", "2006"],
-        "turismo": [120, 125, 140, 145, 155, 160],
-        "energia_renovable": [5, 8, 10, 15, 18, 22]
-    })
-
 ### PARTICIPACION ELECTORAL CSV ###
 part_electoral_df = pd.read_csv("./ETL/Transform/transformed_files/participacion_electoral.csv")
 part_electoral_df['participación'] = part_electoral_df['participación'].interpolate()
@@ -205,8 +187,20 @@ Puedes preguntarle cosas como:
 - “¿Qué relación hay entre educación y pobreza?”
 """)
 
+# Preparación del DataFrame combinado para el análisis, no todos tienen el mismo x. Usar pd.concat
+df = pd.concat([
+    part_electoral_df.set_index('año'),
+    edu_superior_df.set_index('fecha'),
+    desempleo_df.set_index('fecha'),
+    pobreza_df.set_index('año'),
+    ingreso_medio_df.set_index('año'),
+    riesgo_cancer_df.set_index('año'),
+    concentracion_diesel_df.set_index('año'),
+    cambio_rcp85_df.set_index('año')
+], axis=1).reset_index().rename(columns={'index': 'año'})
+
 # API Key
-api_key = st.text_input("🔑 Introduce tu API key de OpenAI:", type="password")
+api_key = st.secrets["api_key"]
 
 # Entrada del usuario
 user_input = st.text_area("✏️ Escribe tu pregunta aquí:")
@@ -220,7 +214,7 @@ if st.button("Preguntar a la IA"):
             client = OpenAI(api_key=api_key)
 
             # Preparamos una muestra representativa del DataFrame
-            muestra = df.head(10).to_markdown(index=False)
+            muestra = cambio_rcp85_df.head(10).to_markdown(index=False)
             columnas = ", ".join(df.columns)
 
             system_prompt = f"""
