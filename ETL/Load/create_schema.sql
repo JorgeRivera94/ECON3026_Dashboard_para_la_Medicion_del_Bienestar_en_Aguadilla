@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS participacion_electoral (
-    year YEAR,
+    peid SERIAL PRIMARY KEY,
+    eyear INT,
     participation FLOAT
-   );
+);
