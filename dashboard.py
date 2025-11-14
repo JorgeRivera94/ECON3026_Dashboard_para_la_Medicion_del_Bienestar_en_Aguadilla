@@ -34,15 +34,19 @@ else:
 
 ### PARTICIPACION ELECTORAL CSV ###
 part_electoral_df = pd.read_csv("./ETL/Transform/transformed_files/participacion_electoral.csv")
-# Fill missing values with interpolation
 part_electoral_df['participación'] = part_electoral_df['participación'].interpolate()
 
 ### EDUCACION SUPERIOR CSV ###
 edu_superior_df = pd.read_csv("./ETL/Transform/transformed_files/educacion_superior.csv")
+edu_superior_df['educacion_superior'] = edu_superior_df['educacion_superior'].interpolate()
 
 ### DESEMPLEO CSV ###
 desempleo_df = pd.read_csv("./ETL/Transform/transformed_files/desempleo.csv")
 desempleo_df['desempleo'] = desempleo_df['desempleo'].interpolate()
+
+### Pobreza CSV ###
+pobreza_df = pd.read_csv("./ETL/Transform/transformed_files/pobreza.csv")
+pobreza_df['pobreza'] = pobreza_df['pobreza'].interpolate()
 ###################################
 
 # VISUALIZACIÓN DE DATOS
@@ -72,11 +76,11 @@ with col2:
         showarrow=False
     )
     st.plotly_chart(fig2, use_container_width=True, config=config)
-
+#Population Below Poverty Level Status in Past Year
 with col3:
-    fig3 = px.line(df, x="anio", y="pobreza", title="Porcentaje de Pobreza (%)")
+    fig3 = px.line(pobreza_df, x="año", y="pobreza", title="Porcentaje de Pobreza (%)")
     fig3.add_annotation(
-        text="Tasa de la población con un grado de Bachillerato o mayor. Fuente: FRED",
+        text="Tasa de la población bajo el nivel de pobreza. Fuente: Data Commons",
         xref="paper", yref="paper",
         x=0.5, y=-0.25,
         showarrow=False
@@ -94,7 +98,7 @@ with col4:
     fig4 = px.line(desempleo_df, x="fecha", y="desempleo", title="Desempleo (%)")
     fig4.update_layout(xaxis_title="Año", yaxis_title="Desempleo (%)")
     fig4.add_annotation(
-        text="Tasa de la desempleo. Fuente: FRED",
+        text="Tasa del desempleo. Fuente: Data Commons",
         xref="paper", yref="paper",
         x=0.5, y=-0.25,
         showarrow=False
@@ -115,7 +119,8 @@ st.markdown("""
 **Fuentes de Datos:**
 - Participación Electoral: [Comisión Estatal de Elecciones de Puerto Rico](https://ww2.ceepur.org/Home/Estadisticas)
 - Educación Superior: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/HC01ESTVC1772005)
-- Desempleo: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/LAUCN720050000000003A)
+- Pobreza: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
+- Desempleo: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
 """)
 
 
