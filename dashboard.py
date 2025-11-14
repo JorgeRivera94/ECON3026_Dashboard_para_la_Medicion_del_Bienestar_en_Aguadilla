@@ -27,7 +27,6 @@ else:
     st.warning("⚠️ No has subido ningún CSV. Se usarán datos de ejemplo.")
     df = pd.DataFrame({
         "anio": ["2000", "2001", "2003", "2004", "2005", "2006"],
-        "pobreza": [35, 33, 30, 28, 25, 23],
         "turismo": [120, 125, 140, 145, 155, 160],
         "energia_renovable": [5, 8, 10, 15, 18, 22]
     })
@@ -47,6 +46,18 @@ desempleo_df['desempleo'] = desempleo_df['desempleo'].interpolate()
 ### Pobreza CSV ###
 pobreza_df = pd.read_csv("./ETL/Transform/transformed_files/pobreza.csv")
 pobreza_df['pobreza'] = pobreza_df['pobreza'].interpolate()
+
+### Ingreso Medio CSV ###
+ingreso_medio_df = pd.read_csv("./ETL/Transform/transformed_files/ingreso_medio.csv")
+ingreso_medio_df['ingreso_medio'] = ingreso_medio_df['ingreso_medio'].interpolate()
+
+### RIESGO DE CANCER CSV ###
+riesgo_cancer_df = pd.read_csv("./ETL/Transform/transformed_files/riesgo_cancer.csv")
+riesgo_cancer_df['riesgo'] = riesgo_cancer_df['riesgo'].interpolate()
+
+## CONCENTRACION DIESEL CSV ###
+concentracion_diesel_df = pd.read_csv("./ETL/Transform/transformed_files/concentracion_diesel.csv")
+concentracion_diesel_df['concentración'] = concentracion_diesel_df['concentración'].interpolate()
 ###################################
 
 # VISUALIZACIÓN DE DATOS
@@ -76,11 +87,12 @@ with col2:
         showarrow=False
     )
     st.plotly_chart(fig2, use_container_width=True, config=config)
-#Population Below Poverty Level Status in Past Year
+
 with col3:
-    fig3 = px.line(pobreza_df, x="año", y="pobreza", title="Porcentaje de Pobreza (%)")
+    fig3 = px.line(pobreza_df, x="año", y="pobreza", title="Población en Pobreza")
+    fig3.update_layout(xaxis_title="Año", yaxis_title="Población en Pobreza")
     fig3.add_annotation(
-        text="Tasa de la población bajo el nivel de pobreza. Fuente: Data Commons",
+        text="Cantidad de la población bajo el nivel de pobreza. Fuente: Data Commons",
         xref="paper", yref="paper",
         x=0.5, y=-0.25,
         showarrow=False
@@ -90,7 +102,7 @@ with col3:
 
 
 # Segunda fila de gráficos
-st.subheader("Indicadores ") 
+# st.subheader("Indicadores ") 
 
 col4, col5, col6 = st.columns(3)
 
@@ -106,13 +118,40 @@ with col4:
     st.plotly_chart(fig4, use_container_width=True, config=config)
 
 with col5:
-    fig5 = px.line(df, x="anio", y="turismo", title="Turismo (Visitantes en miles)")
+    fig5 = px.line(ingreso_medio_df, x="año", y="ingreso_medio", title="Ingreso Medio por Individuo (USD)")
+    fig5.update_layout(xaxis_title="Año", yaxis_title="Ingreso Medio por Individuo (USD)")
+    fig5.add_annotation(
+        text="Ingreso medio por individuo. Fuente: Data Commons",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig5, use_container_width=True, config=config)
 
 
 with col6:
-    fig6 = px.line(df, x="anio", y="energia_renovable", title="Energía Renovable (%)")
+    fig6 = px.line(riesgo_cancer_df, x="año", y="riesgo", title="Riesgo a Padecer de Cáncer por Exposición A Sustancias Tóxicas en el Aire")
+    fig6.update_layout(xaxis_title="Año", yaxis_title="Riesgo (ppm)")
+    fig6.add_annotation(
+        text="En personas por millón. Fuente: Data Commons",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig6, use_container_width=True, config=config)
+
+col7, col8, col9 = st.columns(3)
+#Mean Concentration of Diesel PM Air Pollutant
+with col7:
+    fig7 = px.line(concentracion_diesel_df, x="año", y="concentración", title="Concentración de MP de Diesel en Aire (µg/m³)")
+    fig7.update_layout(xaxis_title="Año", yaxis_title="MP de Diesel en Aire (µg/m³)")
+    fig7.add_annotation(
+        text="Concentración promedio de MP de diesel en el aire. Fuente: Data Commons",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
+    st.plotly_chart(fig7, use_container_width=True, config=config)
 
 ### LINKS A FUENTES DE DATOS ###
 st.markdown("""
@@ -121,6 +160,9 @@ st.markdown("""
 - Educación Superior: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/HC01ESTVC1772005)
 - Pobreza: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
 - Desempleo: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
+- Ingreso Medio Por Individio: [Data Commons](https://datacommons.org/place/geoId/72005?hl=es)
+- Riesgo de Cáncer: [Data Commons](https://datacommons.org/place/geoId/72005?category=Environment&hl=es)
+- Concentración de MP de Diesel en Aire: [Data Commons](https://datacommons.org/place/geoId/72005?category=Environment&hl=es)
 """)
 
 
