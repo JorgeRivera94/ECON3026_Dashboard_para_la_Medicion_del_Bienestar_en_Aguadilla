@@ -27,14 +27,20 @@ else:
     st.warning("⚠️ No has subido ningún CSV. Se usarán datos de ejemplo.")
     df = pd.DataFrame({
         "anio": ["2000", "2001", "2003", "2004", "2005", "2006"],
-        "participacion_electoral": [78, 84, 65, 90, 200, 80],
-        "educacion_superior": [55, 58, 60, 62, 65, 70],
         "pobreza": [35, 33, 30, 28, 25, 23],
         "empleo": [60, 62, 64, 68, 70, 72],
         "turismo": [120, 125, 140, 145, 155, 160],
         "energia_renovable": [5, 8, 10, 15, 18, 22]
     })
 
+### PARTICIPACION ELECTORAL CSV ###
+part_electoral_df = pd.read_csv("./ETL/Transform/transformed_files/participacion_electoral.csv")
+# Fill missing values with interpolation
+part_electoral_df['participación'] = part_electoral_df['participación'].interpolate()
+
+### EDUCACION SUPERIOR CSV ###
+edu_superior_df = pd.read_csv("./ETL/Transform/transformed_files/educacion_superior.csv")
+###################################
 
 # VISUALIZACIÓN DE DATOS
 st.subheader("Indicadores ")
@@ -42,17 +48,36 @@ st.subheader("Indicadores ")
 col1, col2, col3 = st.columns(3)
 
 
-
 with col1:
-    fig1 = px.line(df, x="anio", y="participacion_electoral", title="Participación Electoral (%)")
+    fig1 = px.line(part_electoral_df, x="año", y="participación", title="Participación Electoral (%)")
+    fig1.update_layout(xaxis_title="Año", yaxis_title="Participación Electoral (%)")
+    fig1.add_annotation(
+        text="Tasa de participacón electoral. Fuente: Comisión Estatal de Elecciones de Puerto Rico",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig1, use_container_width=True, config=config)
 
 with col2:
-    fig2 = px.line(df, x="anio", y="educacion_superior", title="Educación Superior (%)")
+    fig2 = px.line(edu_superior_df, x="fecha", y="educacion_superior", title="Educación Superior (%)")
+    fig2.update_layout(xaxis_title="Año", yaxis_title="Educación Superior (%)")
+    fig2.add_annotation(
+        text="Tasa de la población con un grado de Bachillerato o mayor. Fuente: FRED",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig2, use_container_width=True, config=config)
 
 with col3:
     fig3 = px.line(df, x="anio", y="pobreza", title="Porcentaje de Pobreza (%)")
+    fig3.add_annotation(
+        text="Tasa de la población con un grado de Bachillerato o mayor. Fuente: FRED",
+        xref="paper", yref="paper",
+        x=0.5, y=-0.25,
+        showarrow=False
+    )
     st.plotly_chart(fig3, use_container_width=True, config=config)
 
 
@@ -74,6 +99,13 @@ with col5:
 with col6:
     fig6 = px.line(df, x="anio", y="energia_renovable", title="Energía Renovable (%)")
     st.plotly_chart(fig6, use_container_width=True, config=config)
+
+### LINKS A FUENTES DE DATOS ###
+st.markdown("""
+**Fuentes de Datos:**
+- Participación Electoral: [Comisión Estatal de Elecciones de Puerto Rico](https://ww2.ceepur.org/Home/Estadisticas)
+- Educación Superior: [FRED - Federal Reserve Economic Data](https://fred.stlouisfed.org/series/HC01ESTVC1772005)
+""")
 
 
 # SECCIÓN DE CHAT IA
